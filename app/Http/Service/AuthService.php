@@ -2,11 +2,12 @@
 
 namespace App\Http\Service;
 use App\Http\Repositories\AuthRepository;
-use Laravel\Sanctum\NewAccessToken;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
- * Class AuthService
- * Class AuthService is responsible for operation on  user Auth
+ * AuthService Class
+ * AuthService is responsible for serving AuthController with User Auth methods
  */
 class AuthService
 {
@@ -24,13 +25,24 @@ class AuthService
         $this->authRepository = $authRepository;
     }
 
-    public function RegisterUser(string $name, string $email, string $password): NewAccessToken
+    /**
+     * Register User service method to register users
+     * @param string $name
+     * @param string $email
+     * @param string $password
+     * @return User
+     */
+    public function RegisterUser(string $name, string $email, string $password): User
     {
-         $user = $this->authRepository->RegisterUser($name, $email, $password);
+         return $this->authRepository->RegisterUser($name, $email, $password);
 
-         return $user->createToken('Register');
     }
 
+    /**
+     * @param string $email
+     * @param string $password
+     * @return Authenticatable|void
+     */
     public function LoginUser(string $email, string $password)
     {
         return $this->authRepository->LoginUser($email, $password);

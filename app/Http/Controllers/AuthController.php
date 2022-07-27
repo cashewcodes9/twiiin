@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Repositories\AuthRepository;
-use App\Http\Requests\AuthRequest;
+use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Service\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * AuthController Class
+ * AuthController is responsible to handle user auth flows : register user, login user
+ */
 class AuthController extends Controller
 {
     /* @var AuthRepository */
@@ -19,6 +22,11 @@ class AuthController extends Controller
     /* @var AuthService */
     protected AuthService $authService;
 
+    /**
+     * AuthController Constructor
+     * @param AuthService $authService
+     * @param AuthRepository $authRepository
+     */
     public function __construct(
         AuthService $authService,
         AuthRepository $authRepository
@@ -28,19 +36,32 @@ class AuthController extends Controller
         $this->authRepository = $authRepository;
     }
 
-    public function RegisterUser(AuthRequest $authRequest): JsonResponse
+    /**
+     * AuthController
+     * Method to Register new Users
+     * @param UserRegisterRequest $authRequest
+     * @return JsonResponse
+     */
+    public function RegisterUser(UserRegisterRequest $authRequest): JsonResponse
     {
         $data = $authRequest->validated();
         $name = Arr::get($data, 'name');
         $email = Arr::get($data, 'email');
         $password = Arr::get($data, 'password');
 
-        $accessToken = $this->authService->RegisterUser($name, $email, $password);
+        $user = $this->authService->RegisterUser($name, $email, $password);
+        $accessToken = $user->createToken('AuthToken');
 
-        return Response()->json($accessToken)->setStatusCode(200);
+        return Response()->json(['user' => Auth::user(), 'token' => $accessToken])->setStatusCode(200);
     }
 
-    public function LoginUser(UserLoginRequest $userLoginRequest)
+    /**
+     * LoginUser
+     * Method to Login Users
+     * @param UserLoginRequest $userLoginRequest
+     * @return JsonResponse
+     */
+    public function LoginUser(UserLoginRequest $userLoginRequest): JsonResponse
     {
         $data = $userLoginRequest->validated();
         $email = Arr::get($data, 'email');
@@ -49,5 +70,14 @@ class AuthController extends Controller
         $response = $this->authService->LoginUser($email, $password);
 
         return Response()->json($response)->setStatusCode(200);
+    }
+
+    /**
+     * AuthenticatedUser
+     * Method to return Authenticated user details
+     */
+    public function AuthenticatedUser(): JsonResponse
+    {
+        return response()->json(['authenticated-user' => auth()->user()], 200);
     }
 }
