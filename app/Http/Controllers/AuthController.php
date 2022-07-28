@@ -53,9 +53,9 @@ class AuthController extends Controller
         $password = Arr::get($data, 'password');
 
         $user = $this->authService->RegisterUser($name, $email, $password);
-        $accessToken = $user->createToken('AuthToken');
+        $token = $user->createToken('AuthToken');
 
-        return Response()->json(['user' => Auth::user(), 'token' => $accessToken])->setStatusCode(200);
+        return Response()->json(['accessToken' => $token->accessToken])->setStatusCode(200);
     }
 
     /**
@@ -75,7 +75,7 @@ class AuthController extends Controller
             if (Hash::check($password, $user->password)) {
                 $token = $user->createToken('Laravel Personal Access Client');
 
-                return Response()->json(['token' => $token])->setStatusCode(200);
+                return Response()->json(['accessToken' => $token->accessToken])->setStatusCode(200);
             } else {
                 return Response()->json(['message' => "Password mismatch"])->setStatusCode(422);
             }
@@ -88,14 +88,5 @@ class AuthController extends Controller
         $token = $request->user()->token();
         $token->revoke();
         Response()->json(['message' => 'You have been successfully logged out!'])->setStatusCode(200);
-    }
-
-    /**
-     * AuthenticatedUser
-     * Method to return Authenticated user details
-     */
-    public function AuthenticatedUser(): JsonResponse
-    {
-        return response()->json(['authenticated-user' => auth()->user()], 200);
     }
 }
