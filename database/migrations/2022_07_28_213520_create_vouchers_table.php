@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('voucher', function (Blueprint $table) {
+        Schema::create('vouchers', function (Blueprint $table) {
            $table->id();
            $table->integer('user_id')->nullable()->default(0);
-           $table->string('voucher')->unique()->default('');
+           $table->string('voucher', 8)->unique()->default('');
            $table->integer('expiry')->nullable()->default(0);
            $table->timestamps();
         });
