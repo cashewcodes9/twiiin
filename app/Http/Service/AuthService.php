@@ -38,14 +38,4 @@ class AuthService
 
     }
 
-    /**
-     * @param string $email
-     * @param string $password
-     * @return Authenticatable|void
-     */
-    public function LoginUser(string $email, string $password)
-    {
-        return $this->authRepository->LoginUser($email, $password);
-    }
-
 }

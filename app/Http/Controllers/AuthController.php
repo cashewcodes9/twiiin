@@ -6,9 +6,12 @@ use App\Http\Repositories\AuthRepository;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Service\AuthService;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * AuthController Class
@@ -67,9 +70,24 @@ class AuthController extends Controller
         $email = Arr::get($data, 'email');
         $password = Arr::get($data, 'password');
 
-        $response = $this->authService->LoginUser($email, $password);
+        $user = User::where('email', $email)->first();
+        if ($user) {
+            if (Hash::check($password, $user->password)) {
+                $token = $user->createToken('Laravel Personal Access Client');
 
-        return Response()->json($response)->setStatusCode(200);
+                return Response()->json(['token' => $token])->setStatusCode(200);
+            } else {
+                return Response()->json(['message' => "Password mismatch"])->setStatusCode(422);
+            }
+        } else {
+            return Response()->json(['message' => 'User does not exist']);
+        }
+    }
+
+    public function logout (Request $request) {
+        $token = $request->user()->token();
+        $token->revoke();
+        Response()->json(['message' => 'You have been successfully logged out!'])->setStatusCode(200);
     }
 
     /**

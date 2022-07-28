@@ -2,9 +2,11 @@
 
 namespace App\Http\Repositories;
 
+use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * AuthRepository Class
@@ -25,24 +27,9 @@ class AuthRepository
         $user = new User();
         $user->name = $name;
         $user->email = $email;
-        $user->password = bcrypt($password);
+        $user->password = Hash::make($password);
         $user->save();
 
         return $user;
-    }
-
-    /**
-     * Login user
-     * @param string $email
-     * @param string $password
-     * @return Authenticatable|void
-     */
-    public function LoginUser(string $email, string $password)
-    {
-        if (Auth::attempt([$email, $password], true)) {
-            // generate access token for user if successful login attempt, return the access token
-            auth()->user()->createToken('Login')->accessToken;
-            return auth()->user();
-        }
     }
 }
