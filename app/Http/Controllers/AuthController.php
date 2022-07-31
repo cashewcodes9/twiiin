@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -42,17 +41,17 @@ class AuthController extends Controller
     /**
      * AuthController
      * Method to Register new Users
-     * @param UserRegisterRequest $authRequest
+     * @param UserRegisterRequest $userRegisterRequest
      * @return JsonResponse
      */
-    public function RegisterUser(UserRegisterRequest $authRequest): JsonResponse
+    public function RegisterUser(UserRegisterRequest $userRegisterRequest): JsonResponse
     {
-        $data = $authRequest->validated();
-        $name = Arr::get($data, 'name');
+        $data = $userRegisterRequest->validated();
+        $voucher = Arr::get($data, 'voucher');
         $email = Arr::get($data, 'email');
         $password = Arr::get($data, 'password');
 
-        $user = $this->authService->RegisterUser($name, $email, $password);
+        $user = $this->authService->RegisterUser($voucher, $email, $password);
         $token = $user->createToken('AuthToken');
 
         return Response()->json(['accessToken' => $token->accessToken])->setStatusCode(200);

@@ -3,7 +3,6 @@
 namespace App\Http\Service;
 use App\Http\Repositories\AuthRepository;
 use App\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
  * AuthService Class
@@ -27,14 +26,14 @@ class AuthService
 
     /**
      * Register User service method to register users
-     * @param string $name
+     * @param string $voucher
      * @param string $email
      * @param string $password
      * @return User
      */
-    public function RegisterUser(string $name, string $email, string $password): User
+    public function RegisterUser(string $voucher, string $email, string $password): User
     {
-         return $this->authRepository->RegisterUser($name, $email, $password);
+         return $this->authRepository->RegisterUser($voucher, $email, $password);
 
     }
 

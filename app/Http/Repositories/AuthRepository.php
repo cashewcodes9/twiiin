@@ -2,11 +2,10 @@
 
 namespace App\Http\Repositories;
 
-use App\Exceptions\UserNotFoundException;
 use App\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\Hash;
+use JsonException;
 
 /**
  * AuthRepository Class
@@ -17,18 +16,26 @@ class AuthRepository
 {
     /**
      * Register new user
-     * @param string $name
+     * @param string $voucher
      * @param string $email
      * @param string $password
      * @return User
+     * @throws JsonException
      */
-    public function RegisterUser(string $name, string $email, string $password): User
+    public function RegisterUser(string $voucher, string $email, string $password): User
     {
-        $user = new User();
-        $user->name = $name;
-        $user->email = $email;
-        $user->password = Hash::make($password);
-        $user->save();
+        $voucher = Voucher::where('voucher', $voucher)->first();
+
+        if (!$voucher) {
+            throw new JSONException("Voucher doesn't exist");
+        } else {
+            $user = new User();
+            $user->email = $email;
+            $user->password = Hash::make($password);
+            $user->save();
+
+            $voucher->delete();
+        }
 
         return $user;
     }
