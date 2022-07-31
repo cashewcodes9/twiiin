@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('vouchers', function (Blueprint $table) {
            $table->id();
            $table->string('voucher', 8)->unique()->default('');
-           $table->integer('expiry')->nullable()->default(0);
            $table->timestamp('expires_at');
            $table->timestamps();
         });
